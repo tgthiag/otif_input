@@ -31,9 +31,10 @@ class _MyHomePage extends StatefulWidget {
 class _MyHomePageState extends State<_MyHomePage> {
   bool _useCurrentDateBegin = true;
   bool _useCurrentDateEnd = true;
-  final String? title = 'Lançamento OTIF Expedição';
+  final String? title = 'SGA Logística';
   late TextEditingController controller1;
   late TextEditingController controller2;
+  DateTime _selectedDate = DateTime.now();
 
   void _handleRadioChangedBegin(bool? value) {
     setState(() {
@@ -59,6 +60,68 @@ class _MyHomePageState extends State<_MyHomePage> {
     );
   }
 
+  Future<void> _selectDate(BuildContext context) async {
+    final DateTime? selected = await showModalBottomSheet<DateTime>(
+      context: context,
+      builder: (BuildContext context) {
+        return Container(
+          height: 250,
+          child: Column(
+            children: <Widget>[
+              Expanded(
+                child: Container(
+                  child: DateTimePicker(
+                    type: DateTimePickerType.dateTimeSeparate,
+                    dateMask: 'd MMM, yyyy',
+                    initialValue: _selectedDate.toString(),
+                    firstDate: DateTime(2000),
+                    lastDate: DateTime(2100),
+                    icon: const Icon(Icons.event),
+                    dateLabelText: 'Date',
+                    timeLabelText: "Hour",
+                    selectableDayPredicate: (date) {
+                      if (date.weekday == 6 || date.weekday == 7) {
+                        return false;
+                      }
+                      return true;
+                    },
+                    onChanged: (val) =>
+                        setState(() => _selectedDate = DateTime.parse(val)),
+                    validator: (val) {
+                      return null;
+                    },
+                    onSaved: (val) => print(val),
+                  ),
+                ),
+              ),
+              Container(
+                height: 50,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: <Widget>[
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context),
+                      child: const Text('CANCEL'),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => Navigator.pop(context, _selectedDate),
+                      child: const Text('OK'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    );
+    if (selected != null && selected != _selectedDate) {
+      setState(() {
+        _selectedDate = selected;
+      });
+    }
+  }
+
   @override
   void initState() {
     controller1 = TextEditingController(text: DateTime.now().toString());
@@ -72,7 +135,7 @@ class _MyHomePageState extends State<_MyHomePage> {
       appBar: AppBar(
         title: Text(
           title!,
-          style: const TextStyle(fontSize: 28.0, fontWeight: FontWeight.bold),
+          style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
         ),
       ),
       body: Stack(fit: StackFit.expand, children: [
@@ -95,8 +158,37 @@ class _MyHomePageState extends State<_MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              Container(
+                margin: const EdgeInsets.only(bottom: 60),
+                child: Column(
+                  children: const [
+                    Image(
+                      image: AssetImage('images/logo.png'),
+                      width: 200,
+                      height: 200,
+                    ),
+                    Text(
+                      'Lançamento OTIF Expedição',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 24,
+                        fontWeight: FontWeight.bold,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 2.0,
+                            color: Colors.grey,
+                            offset: Offset(1.0, 1.0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              ElevatedButton(onPressed: () => _selectDate(context), child: Text("$_selectedDate")),
               //ENTRADA
               Container(
+                padding: const EdgeInsets.all(8),
                 margin: const EdgeInsets.symmetric(
                     horizontal: 30.0, vertical: 10.0),
                 decoration: BoxDecoration(
@@ -165,6 +257,7 @@ class _MyHomePageState extends State<_MyHomePage> {
 
               // SAIDA
               Container(
+                padding: const EdgeInsets.all(8),
                 margin: const EdgeInsets.symmetric(
                     horizontal: 30.0, vertical: 10.0),
                 decoration: BoxDecoration(
@@ -200,7 +293,7 @@ class _MyHomePageState extends State<_MyHomePage> {
                     ),
                     if (_useCurrentDateEnd == false)
                       Container(
-                        margin: EdgeInsets.all(15),
+                        margin: const EdgeInsets.all(15),
                         child: DateTimePicker(
                             type: DateTimePickerType.dateTimeSeparate,
                             dateMask: 'd MMM, yyyy',
