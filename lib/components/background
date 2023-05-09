@@ -1,0 +1,19 @@
+import 'package:flutter/material.dart';
+
+class ContainerBackground extends StatelessWidget {
+  const ContainerBackground({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      alignment: Alignment.center,
+      decoration: const BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Color(0xff8fcaf9), Colors.blue],
+            stops: [0.1, 0.9],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          )),
+    );
+  }
+}
