@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:otif_input/components/background';
 import 'package:date_time_picker/date_time_picker.dart';
+import 'package:intl/intl.dart';
 
 void main() {
   runApp(const MyApp());
@@ -35,6 +36,8 @@ class _MyHomePageState extends State<_MyHomePage> {
   late TextEditingController controller1;
   late TextEditingController controller2;
   DateTime _selectedDate = DateTime.now();
+  DateTime selectedDateBegin = DateTime.now();
+  DateTime selectedDateEnd = DateTime.now();
 
   void _handleRadioChangedBegin(bool? value) {
     setState(() {
@@ -60,7 +63,7 @@ class _MyHomePageState extends State<_MyHomePage> {
     );
   }
 
-  Future<void> _selectDate(BuildContext context) async {
+  Future<void> _selectDate(BuildContext context, String process) async {
     final DateTime? selected = await showModalBottomSheet<DateTime>(
       context: context,
       builder: (BuildContext context) {
@@ -85,8 +88,13 @@ class _MyHomePageState extends State<_MyHomePage> {
                       }
                       return true;
                     },
-                    onChanged: (val) =>
-                        setState(() => _selectedDate = DateTime.parse(val)),
+                    onChanged: (val) {
+                      if (process == "start") {
+                        setState(() => selectedDateBegin = DateTime.parse(val));
+                      } else {
+                        setState(() => selectedDateEnd = DateTime.parse(val));
+                      }
+                    },
                     validator: (val) {
                       return null;
                     },
@@ -158,171 +166,62 @@ class _MyHomePageState extends State<_MyHomePage> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
+              const Image(
+                image: AssetImage('images/logo.png'),
+                width: 200,
+                height: 120,
+              ),
               Container(
-                margin: const EdgeInsets.only(bottom: 60),
-                child: Column(
-                  children: const [
-                    Image(
-                      image: AssetImage('images/logo.png'),
-                      width: 200,
-                      height: 200,
-                    ),
-                    Text(
-                      'Lançamento OTIF Expedição',
-                      style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 24,
-                        fontWeight: FontWeight.bold,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 2.0,
-                            color: Colors.grey,
-                            offset: Offset(1.0, 1.0),
-                          ),
-                        ],
+                margin: const EdgeInsets.symmetric(horizontal: 10),
+                child: const Text(
+                  'Lançamento OTIF Expedição',
+                  style: TextStyle(
+                    color: Colors.black,
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    shadows: [
+                      Shadow(
+                        blurRadius: 2.0,
+                        color: Colors.grey,
+                        offset: Offset(1.0, 1.0),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
               ),
-              ElevatedButton(onPressed: () => _selectDate(context), child: Text("$_selectedDate")),
-              //ENTRADA
               Container(
-                padding: const EdgeInsets.all(8),
-                margin: const EdgeInsets.symmetric(
-                    horizontal: 30.0, vertical: 10.0),
-                decoration: BoxDecoration(
-                    border: Border.all(width: 1.0, color: Colors.grey)),
+                margin: const EdgeInsets.symmetric(vertical: 6.0),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Data de entrada:",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: const Text('Usar data/hora atual'),
-                            value: true,
-                            groupValue: _useCurrentDateBegin,
-                            onChanged: _handleRadioChangedBegin,
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: const Text('Inserir manualmente'),
-                            value: false,
-                            groupValue: _useCurrentDateBegin,
-                            onChanged: _handleRadioChangedBegin,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_useCurrentDateBegin == false)
-                      Container(
-                        margin: const EdgeInsets.all(15),
-                        child: DateTimePicker(
-                            type: DateTimePickerType.dateTimeSeparate,
-                            dateMask: 'd MMM, yyyy',
-                            controller: controller2,
-                            //initialValue: _initialValue,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                            icon: const Icon(Icons.event),
-                            dateLabelText: 'Date',
-                            timeLabelText: "Hour",
-                            //use24HourFormat: false,
-                            //locale: Locale('pt', 'BR'),
-                            selectableDayPredicate: (date) {
-                              if (date.weekday == 6 || date.weekday == 7) {
-                                return false;
-                              }
-                              return true;
-                            },
-                            onChanged: (val) =>
-                                setState(() => print("changed")),
-                            validator: (val) {
-                              setState(() => print("validating"));
-                              return null;
-                            },
-                            onSaved: (val) => print("saved")),
-                      ),
+                    const Text("Horário de entrada"),
+                    ElevatedButton(
+                        onPressed: () => _selectDate(context, "start"),
+                        child: Text(DateFormat('dd/MM/yyyy HH:mm')
+                            .format(selectedDateBegin))),
                   ],
                 ),
               ),
-
-              // SAIDA
               Container(
-                padding: const EdgeInsets.all(8),
-                margin: const EdgeInsets.symmetric(
-                    horizontal: 30.0, vertical: 10.0),
-                decoration: BoxDecoration(
-                    border: Border.all(width: 1.0, color: Colors.grey)),
+                margin: const EdgeInsets.only(top: 8,bottom: 20),
                 child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    const Text(
-                      "Data de saída:",
-                      style:
-                          TextStyle(fontWeight: FontWeight.bold, fontSize: 22),
-                    ),
-                    Row(
-                      children: [
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: const Text('Usar data/hora atual'),
-                            value: true,
-                            groupValue: _useCurrentDateEnd,
-                            onChanged: _handleRadioChangedEnd,
-                          ),
-                        ),
-                        Expanded(
-                          child: RadioListTile<bool>(
-                            title: const Text('Inserir manualmente'),
-                            value: false,
-                            groupValue: _useCurrentDateEnd,
-                            onChanged: _handleRadioChangedEnd,
-                          ),
-                        ),
-                      ],
-                    ),
-                    if (_useCurrentDateEnd == false)
-                      Container(
-                        margin: const EdgeInsets.all(15),
-                        child: DateTimePicker(
-                            type: DateTimePickerType.dateTimeSeparate,
-                            dateMask: 'd MMM, yyyy',
-                            controller: controller1,
-                            //initialValue: _initialValue,
-                            firstDate: DateTime(2000),
-                            lastDate: DateTime(2100),
-                            icon: const Icon(Icons.event),
-                            dateLabelText: 'Date',
-                            timeLabelText: "Hour",
-                            //use24HourFormat: false,
-                            //locale: Locale('pt', 'BR'),
-                            selectableDayPredicate: (date) {
-                              if (date.weekday == 6 || date.weekday == 7) {
-                                return false;
-                              }
-                              return true;
-                            },
-                            onChanged: (val) =>
-                                setState(() => print("changed")),
-                            validator: (val) {
-                              setState(() => print("validating"));
-                              return null;
-                            },
-                            onSaved: (val) => print("saved")),
-                      ),
+                    const Text("Horário de saída"),
+                    ElevatedButton(
+                      onPressed: () => _selectDate(context, "end"),
+                      child: Text(DateFormat('dd/MM/yyyy HH:mm')
+                          .format(selectedDateEnd)),
+                    )
                   ],
                 ),
               ),
+              const Text("Ocorrências:"),
+              Container(
+                margin: EdgeInsets.symmetric(horizontal: 120),
+                child: TextField(
+                  textAlign: TextAlign.center,
+                  maxLines: 2,
+                ),
+              )
             ],
           ),
         ),
