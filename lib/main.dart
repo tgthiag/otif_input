@@ -2,6 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:otif_input/components/background';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:otif_input/function/insertExcelRow';
+
+// import 'package:otif_input/function/insertExcelRow';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +17,6 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
@@ -38,6 +40,24 @@ class _MyHomePageState extends State<_MyHomePage> {
   DateTime _selectedDate = DateTime.now();
   DateTime selectedDateBegin = DateTime.now();
   DateTime selectedDateEnd = DateTime.now();
+  xlsx excel = xlsx();
+
+  void sendDatatoExcel() {
+    String id = "";
+    String orderStart = DateFormat('dd/MM/yyyy HH:mm').format(selectedDateEnd);
+    String orderFinished =
+        DateFormat('dd/MM/yyyy HH:mm').format(selectedDateEnd);
+    String insertedAt = DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now());
+    String occurrence = "";
+    List<String> dataList = [
+      id,
+      insertedAt,
+      orderStart,
+      orderFinished,
+      occurrence
+    ];
+    excel.insertExcelRow(dataList);
+  }
 
   void _handleRadioChangedBegin(bool? value) {
     setState(() {
@@ -202,7 +222,7 @@ class _MyHomePageState extends State<_MyHomePage> {
                 ),
               ),
               Container(
-                margin: const EdgeInsets.only(top: 8,bottom: 20),
+                margin: const EdgeInsets.only(top: 8, bottom: 20),
                 child: Column(
                   children: [
                     const Text("Horário de saída"),
@@ -214,10 +234,13 @@ class _MyHomePageState extends State<_MyHomePage> {
                   ],
                 ),
               ),
+              ElevatedButton(
+                  onPressed: () => sendDataToExcel(),
+                  child: const Text("teste")),
               const Text("Ocorrências:"),
               Container(
-                margin: EdgeInsets.symmetric(horizontal: 120),
-                child: TextField(
+                margin: const EdgeInsets.symmetric(horizontal: 120),
+                child: const TextField(
                   textAlign: TextAlign.center,
                   maxLines: 2,
                 ),
