@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:otif_input/components/background';
 import 'package:date_time_picker/date_time_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:otif_input/function/insertExcelRow';
+import 'package:otif_input/function/insertExcelRow.dart';
+import 'package:otif_input/components/save_button.dart';
 
 // import 'package:otif_input/function/insertExcelRow';
 
@@ -40,6 +41,7 @@ class _MyHomePageState extends State<_MyHomePage> {
   DateTime _selectedDate = DateTime.now();
   DateTime selectedDateBegin = DateTime.now();
   DateTime selectedDateEnd = DateTime.now();
+  TextEditingController occurrence = TextEditingController();
   xlsx excel = xlsx();
 
   void sendDatatoExcel() {
@@ -48,13 +50,14 @@ class _MyHomePageState extends State<_MyHomePage> {
     String orderFinished =
         DateFormat('dd/MM/yyyy HH:mm').format(selectedDateEnd);
     String insertedAt = DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now());
-    String occurrence = "";
+    String myOcurrences = occurrence.text.toString();
+  
     List<String> dataList = [
       id,
       insertedAt,
       orderStart,
       orderFinished,
-      occurrence
+      "myOcurrences"
     ];
     excel.insertExcelRow(dataList);
   }
@@ -164,8 +167,11 @@ class _MyHomePageState extends State<_MyHomePage> {
         title: Text(
           title!,
           style: const TextStyle(fontSize: 18.0, fontWeight: FontWeight.bold),
-        ),
+        ), actions: [
+         SaveUrlButton(),
+      ],
       ),
+      
       body: Stack(fit: StackFit.expand, children: [
         const ContainerBackground(),
         Container(
@@ -235,12 +241,13 @@ class _MyHomePageState extends State<_MyHomePage> {
                 ),
               ),
               ElevatedButton(
-                  onPressed: () => sendDataToExcel(),
+                  onPressed: () => sendDatatoExcel(),
                   child: const Text("teste")),
               const Text("Ocorrências:"),
               Container(
                 margin: const EdgeInsets.symmetric(horizontal: 120),
-                child: const TextField(
+                child: TextField(
+                  controller: occurrence,
                   textAlign: TextAlign.center,
                   maxLines: 2,
                 ),
