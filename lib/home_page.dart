@@ -25,7 +25,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   void sendDatatoExcel() {
     String id = "";
-    String orderStart = DateFormat('dd/MM/yyyy HH:mm').format(selectedDateEnd);
+    String orderStart = DateFormat('dd/MM/yyyy HH:mm').format(selectedDateBegin);
     String orderFinished =
         DateFormat('dd/MM/yyyy HH:mm').format(selectedDateEnd);
     String insertedAt = DateFormat('dd/MM/yyyy HH:mm').format(DateTime.now());
@@ -36,7 +36,7 @@ class _MyHomePageState extends State<MyHomePage> {
       insertedAt,
       orderStart,
       orderFinished,
-      "myOcurrences"
+      myOcurrences
     ];
     excel.insertExcelRow(dataList);
   }
